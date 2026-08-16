@@ -34,6 +34,25 @@ body {
   color: #0f172a;
 }
 
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-step-in {
+  animation: step-in 0.22s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-step-in {
+    animation: none;
+  }
+}
+
 /* Status badge colors — keep every status->color mapping here, single source of truth. */
 .status-pending { @apply bg-slate-100 text-slate-700; }
 .status-confirmed { @apply bg-blue-100 text-blue-700; }

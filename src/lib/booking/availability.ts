@@ -15,7 +15,7 @@
 // is NOT enough").
 
 import { addMinutes, areIntervalsOverlapping, isBefore } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 import type { BusinessHours, ResourceHours } from "@/types/database";
 
 export interface DayHours {
@@ -55,7 +55,7 @@ export interface TimeSlot {
 }
 
 function toMinutes(time: string): number {
-  const [h, m] = time.split(":").map(Number);
+  const [h = 0, m = 0] = time.split(":").map(Number);
   return h * 60 + m;
 }
 
@@ -125,7 +125,7 @@ export function getAvailableSlots(input: AvailabilityInput): TimeSlot[] {
       continue;
     }
 
-    const startAt = zonedTimeToUtc(`${input.date} ${toHHMM(candidateStart)}`, input.timezone);
+    const startAt = fromZonedTime(`${input.date} ${toHHMM(candidateStart)}`, input.timezone);
     const endAt = addMinutes(startAt, serviceDurationMinutes);
 
     if (isBefore(startAt, now)) continue;
@@ -153,7 +153,7 @@ export function isSlotStillAvailable(
 ): boolean {
   return !existingBookings.some((b) =>
     areIntervalsOverlapping(
-      candidate,
+      { start: candidate.startAt, end: candidate.endAt },
       { start: new Date(b.startAt), end: new Date(b.endAt) },
       { inclusive: false }
     )
