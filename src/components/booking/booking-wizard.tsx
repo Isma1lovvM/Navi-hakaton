@@ -130,7 +130,7 @@ export function BookingWizard({ businessId, businessName, timezone, services, re
   }
 
   return (
-    <div>
+    <div className="pb-24">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-xs font-medium text-slate-400">
           {step}/6 — {STEP_LABELS[step - 1]}
@@ -144,7 +144,7 @@ export function BookingWizard({ businessId, businessName, timezone, services, re
         ))}
       </div>
 
-      <div className="min-h-[280px] py-4">
+      <div key={step} className="min-h-[280px] animate-step-in py-4">
         {step === 1 ? (
           <div className="space-y-2">
             {services.map((s) => (
@@ -246,33 +246,35 @@ export function BookingWizard({ businessId, businessName, timezone, services, re
         ) : null}
       </div>
 
-      <div className="flex gap-2">
-        {step > 1 ? (
-          <button
-            onClick={() => setStep((s) => s - 1)}
-            className="flex items-center gap-1 rounded-md border border-border px-4 py-2.5 text-sm font-medium text-slate-600"
-          >
-            <ChevronLeft className="h-4 w-4" /> Orqaga
-          </button>
-        ) : null}
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-surface p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="mx-auto flex max-w-lg gap-2">
+          {step > 1 ? (
+            <button
+              onClick={() => setStep((s) => s - 1)}
+              className="flex items-center gap-1 rounded-md border border-border px-4 py-3 text-sm font-medium text-slate-600"
+            >
+              <ChevronLeft className="h-4 w-4" /> Orqaga
+            </button>
+          ) : null}
 
-        {step < 6 ? (
-          <button
-            onClick={goNext}
-            disabled={!canGoNext}
-            className="ml-auto flex flex-1 items-center justify-center gap-1 rounded-md bg-accent-600 py-2.5 text-sm font-semibold text-white hover:bg-accent-700 disabled:opacity-50"
-          >
-            Keyingisi <ChevronRight className="h-4 w-4" />
-          </button>
-        ) : (
-          <button
-            onClick={handleConfirm}
-            disabled={submitting || !online}
-            className="ml-auto flex-1 rounded-md bg-accent-600 py-2.5 text-sm font-semibold text-white hover:bg-accent-700 disabled:opacity-50"
-          >
-            {!online ? "Internet yo'q" : submitting ? "Yuborilmoqda..." : "Tasdiqlash"}
-          </button>
-        )}
+          {step < 6 ? (
+            <button
+              onClick={goNext}
+              disabled={!canGoNext}
+              className="ml-auto flex flex-1 items-center justify-center gap-1 rounded-md bg-accent-600 py-3 text-sm font-semibold text-white hover:bg-accent-700 disabled:opacity-50"
+            >
+              Keyingisi <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleConfirm}
+              disabled={submitting || !online}
+              className="ml-auto flex-1 rounded-md bg-accent-600 py-3 text-sm font-semibold text-white hover:bg-accent-700 disabled:opacity-50"
+            >
+              {!online ? "Internet yo'q" : submitting ? "Yuborilmoqda..." : "Tasdiqlash"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

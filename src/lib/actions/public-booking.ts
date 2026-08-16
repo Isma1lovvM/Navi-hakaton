@@ -93,7 +93,7 @@ export async function getAvailableSlotsForSelection(input: {
   timezone: string;
 }): Promise<AvailableSlot[]> {
   const supabase = await createClient();
-  const [y, m, d] = input.date.split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = input.date.split("-").map(Number);
   const dayOfWeek = new Date(y, m - 1, d).getDay() as DayOfWeek;
 
   const [{ data: service }, { data: businessHoursRow }, { data: resourceHoursRow }, bookedRanges] =
