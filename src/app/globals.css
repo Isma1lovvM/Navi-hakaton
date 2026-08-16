@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/*
+  BizFlow design tokens.
+  One accent color (emerald), neutral surfaces, semantic colors for state only.
+  Change --color-accent-* here to re-theme the whole app for a different
+  vertical (workshop / cafe) later — do not hardcode green anywhere else.
+*/
+@theme {
+  --color-accent-50: #ecfdf5;
+  --color-accent-100: #d1fae5;
+  --color-accent-500: #10b981;
+  --color-accent-600: #059669;
+  --color-accent-700: #047857;
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-border: #e2e8f0;
+
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+
+  --radius-card: 0.75rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-surface-muted);
+  color: #0f172a;
+}
+
+/* Status badge colors — keep every status->color mapping here, single source of truth. */
+.status-pending { @apply bg-slate-100 text-slate-700; }
+.status-confirmed { @apply bg-blue-100 text-blue-700; }
+.status-in-progress { @apply bg-accent-100 text-accent-700; }
+.status-completed { @apply bg-emerald-100 text-emerald-700; }
+.status-cancelled { @apply bg-slate-100 text-slate-500 line-through; }
+.status-no-show { @apply bg-red-100 text-red-700; }
