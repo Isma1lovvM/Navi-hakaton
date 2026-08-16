@@ -25,11 +25,13 @@ export interface ServiceCardProps {
   onSelect?: (service: Service) => void;
 }
 
-export interface EmployeeCardProps {
-  resource: Resource;
+export interface EmployeeCardProps<
+  T extends Pick<Resource, "id" | "name" | "type" | "is_active"> = Resource
+> {
+  resource: T;
   statusLabel?: "Available" | "With customer" | "Off today";
   selected?: boolean;
-  onSelect?: (resource: Resource) => void;
+  onSelect?: (resource: T) => void;
 }
 
 export interface ProductRowProps {

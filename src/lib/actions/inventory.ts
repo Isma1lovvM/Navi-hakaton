@@ -44,27 +44,36 @@ export async function adjustInventory(input: unknown) {
 
   const supabase = await createClient();
 
-  const { data: product } = await supabase
-    .from("products")
-    .select("id, quantity")
-    .eq("id", parsed.data.product_id)
-    .eq("business_id", membership.businessId)
-    .single();
+  // Compare-and-swap on the quantity we read, so two concurrent adjustments
+  // can't silently overwrite each other (no raw SQL transaction available
+  // through PostgREST without a dedicated RPC). Retry a few times on conflict.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { data: product } = await supabase
+      .from("products")
+      .select("id, quantity")
+      .eq("id", parsed.data.product_id)
+      .eq("business_id", membership.businessId)
+      .single();
 
-  if (!product) return { error: "Mahsulot topilmadi." };
+    if (!product) return { error: "Mahsulot topilmadi." };
 
-  const newQuantity = Math.max(0, Number(product.quantity) + parsed.data.change);
+    const newQuantity = Math.max(0, Number(product.quantity) + parsed.data.change);
 
-  const { error: updateErr } = await supabase
-    .from("products")
-    .update({ quantity: newQuantity })
-    .eq("id", product.id);
+    const { data: updated, error: updateErr } = await supabase
+      .from("products")
+      .update({ quantity: newQuantity })
+      .eq("id", product.id)
+      .eq("quantity", product.quantity)
+      .select("id");
 
-  if (updateErr) return { error: "Yangilashda xatolik yuz berdi." };
+    if (updateErr) return { error: "Yangilashda xatolik yuz berdi." };
+    if (updated && updated.length > 0) break;
+    if (attempt === 2) return { error: "Boshqa o'zgarish bilan to'qnashdi, qayta urinib ko'ring." };
+  }
 
   await supabase.from("inventory_transactions").insert({
     business_id: membership.businessId,
-    product_id: product.id,
+    product_id: parsed.data.product_id,
     change: parsed.data.change,
     reason: parsed.data.reason,
   });

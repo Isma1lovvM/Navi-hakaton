@@ -49,6 +49,19 @@ export async function listBookings(
   return (data as unknown as BookingWithDetails[]) ?? [];
 }
 
+export async function getCustomerBookings(customerId: string): Promise<BookingWithDetails[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(DETAIL_SELECT)
+    .eq("customer_id", customerId)
+    .order("start_at", { ascending: false })
+    .limit(20);
+
+  if (error) return [];
+  return (data as unknown as BookingWithDetails[]) ?? [];
+}
+
 export async function getEmployeeQueue(resourceId: string): Promise<BookingWithDetails[]> {
   const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
@@ -148,7 +161,7 @@ export async function updateBookingStatus(input: unknown) {
     return { error: "Bu bookingni o'zgartirishga ruxsatingiz yo'q." };
   }
 
-  const allowed = ALLOWED_STATUS_TRANSITIONS[booking.status] ?? [];
+  const allowed = ALLOWED_STATUS_TRANSITIONS[booking.status as BookingStatus] ?? [];
   if (!allowed.includes(parsed.data.status)) {
     return { error: `"${booking.status}" holatidan "${parsed.data.status}"ga o'tish mumkin emas.` };
   }

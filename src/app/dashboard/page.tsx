@@ -8,6 +8,7 @@ import { BookingCard } from "@/components/booking/booking-card";
 import { EmployeeCard } from "@/components/dashboard/employee-card";
 import { EmptyState } from "@/components/layout/empty-state";
 import { requireCurrentMembership } from "@/lib/permissions/get-current-membership";
+import { canManageInventory } from "@/lib/permissions/roles";
 import { getDailyReport } from "@/lib/actions/reports";
 import { getTodaySchedule } from "@/lib/actions/bookings";
 import { listEmployees } from "@/lib/actions/employees";
@@ -15,12 +16,13 @@ import { listProducts } from "@/lib/actions/inventory";
 
 export default async function DashboardOverviewPage() {
   const membership = await requireCurrentMembership();
+  const isOwner = canManageInventory(membership);
 
   const [report, schedule, employees, products] = await Promise.all([
     getDailyReport(membership.businessId),
     getTodaySchedule(membership.businessId),
     listEmployees(membership.businessId),
-    listProducts(membership.businessId),
+    isOwner ? listProducts(membership.businessId) : Promise.resolve([]),
   ]);
 
   const lowStock = products.filter((p) => p.quantity <= p.min_quantity);
@@ -56,7 +58,7 @@ export default async function DashboardOverviewPage() {
             emp.resource ? (
               <EmployeeCard
                 key={emp.id}
-                resource={emp.resource as never}
+                resource={emp.resource}
                 statusLabel={
                   schedule.some((b) => b.resource_id === emp.resource!.id && b.status === "IN_PROGRESS")
                     ? "With customer"

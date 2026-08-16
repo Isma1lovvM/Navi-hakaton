@@ -11,7 +11,7 @@ export function WeeklyRevenueChart({ data }: { data: WeeklyRevenuePoint[] }) {
           <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fontSize: 12, fill: "#64748b" }} axisLine={false} tickLine={false} width={40} />
           <Tooltip
-            formatter={(value: number) => [`${value.toLocaleString("uz-UZ")} so'm`, "Daromad"]}
+            formatter={(value) => [`${Number(value).toLocaleString("uz-UZ")} so'm`, "Daromad"]}
             contentStyle={{ borderRadius: 8, borderColor: "#e2e8f0", fontSize: 12 }}
           />
           <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} />

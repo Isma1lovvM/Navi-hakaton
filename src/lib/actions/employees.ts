@@ -85,6 +85,31 @@ export async function createEmployee(input: unknown) {
   return { success: true };
 }
 
+export async function toggleEmployeeActive(memberId: string, resourceId: string | null, isActive: boolean) {
+  const membership = await requireCurrentMembership();
+  if (!canManageEmployeesAndServices(membership)) {
+    return { error: "Faqat biznes egasi xodim holatini o'zgartira oladi." };
+  }
+
+  const supabase = await createClient();
+
+  const { error: memberErr } = await supabase
+    .from("business_members")
+    .update({ is_active: isActive })
+    .eq("id", memberId)
+    .eq("business_id", membership.businessId);
+
+  if (memberErr) return { error: "Xodim holatini yangilashda xatolik." };
+
+  if (resourceId) {
+    await supabase.from("resources").update({ is_active: isActive }).eq("id", resourceId);
+  }
+
+  revalidatePath("/dashboard/employees");
+  revalidatePath("/dashboard");
+  return { success: true };
+}
+
 export async function updateResourceHoursDay(resourceId: string, input: unknown) {
   const membership = await requireCurrentMembership();
   if (!canManageEmployeesAndServices(membership)) {

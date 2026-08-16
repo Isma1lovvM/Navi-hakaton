@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { BookingStatus } from "@/types/database";
 
 /** Public customer booking form (spec section 15, steps 1-7). */
 export const createBookingSchema = z.object({
@@ -43,7 +44,7 @@ export type RecordPaymentInput = z.infer<typeof recordPaymentSchema>;
  * shows a button for a transition the backend would reject anyway.
  * See spec section 19 (edge cases) + section 10 (statuses).
  */
-export const ALLOWED_STATUS_TRANSITIONS: Record<string, string[]> = {
+export const ALLOWED_STATUS_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
   PENDING: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["IN_PROGRESS", "CANCELLED", "NO_SHOW"],
   IN_PROGRESS: ["COMPLETED", "CANCELLED"],

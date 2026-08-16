@@ -44,6 +44,11 @@ export async function recordPayment(input: unknown) {
 
   if (!booking) return { error: "Booking topilmadi." };
 
+  const { data: existingPayments } = await supabase
+    .from("payments")
+    .select("amount")
+    .eq("booking_id", booking.id);
+
   const { error: paymentErr } = await supabase.from("payments").insert({
     business_id: membership.businessId,
     booking_id: parsed.data.booking_id,
@@ -54,7 +59,8 @@ export async function recordPayment(input: unknown) {
   if (paymentErr) return { error: "To'lovni saqlashda xatolik yuz berdi." };
 
   const servicePrice = (booking.service as unknown as { price: number } | null)?.price ?? 0;
-  const newStatus = parsed.data.amount >= servicePrice ? "PAID" : "PARTIAL";
+  const totalPaid = (existingPayments ?? []).reduce((sum, p) => sum + Number(p.amount), 0) + parsed.data.amount;
+  const newStatus = totalPaid >= servicePrice ? "PAID" : "PARTIAL";
 
   await supabase.from("bookings").update({ payment_status: newStatus }).eq("id", booking.id);
 

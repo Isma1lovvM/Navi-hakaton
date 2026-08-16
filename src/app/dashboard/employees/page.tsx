@@ -1,15 +1,19 @@
-// OWNER: Backend-1 (baza tayyor — resource_hours tahrirlashni kengaytiring)
+// OWNER: Backend-1
 import { PageHeader } from "@/components/layout/page-header";
-import { EmployeeCard } from "@/components/dashboard/employee-card";
 import { EmptyState } from "@/components/layout/empty-state";
 import { EmployeeForm } from "@/components/dashboard/employee-form";
+import { EmployeeHoursPanel } from "@/components/dashboard/employee-hours-panel";
 import { requireCurrentMembership } from "@/lib/permissions/get-current-membership";
-import { listEmployees } from "@/lib/actions/employees";
+import { listEmployees, getResourceHours } from "@/lib/actions/employees";
 import { Users } from "lucide-react";
 
 export default async function EmployeesPage() {
   const membership = await requireCurrentMembership();
   const employees = await listEmployees(membership.businessId);
+  const withResource = employees.filter((emp) => emp.resource);
+  const hoursByResource = await Promise.all(
+    withResource.map((emp) => getResourceHours(emp.resource!.id))
+  );
 
   return (
     <div>
@@ -17,12 +21,10 @@ export default async function EmployeesPage() {
       {employees.length === 0 ? (
         <EmptyState title="Hali xodim qo'shilmagan" icon={Users} />
       ) : (
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {employees.map((emp) =>
-            emp.resource ? (
-              <EmployeeCard key={emp.id} resource={emp.resource as never} statusLabel={emp.resource.is_active ? "Available" : "Off today"} />
-            ) : null
-          )}
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          {withResource.map((emp, i) => (
+            <EmployeeHoursPanel key={emp.id} memberId={emp.id} resource={emp.resource!} hours={hoursByResource[i] ?? []} />
+          ))}
         </div>
       )}
     </div>

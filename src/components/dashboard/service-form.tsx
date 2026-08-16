@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { serviceSchema, type ServiceInput } from "@/lib/validation/service";
 import { createService } from "@/lib/actions/services";
+import type { z } from "zod";
 
 export function ServiceForm() {
   const [open, setOpen] = useState(false);
@@ -16,7 +17,10 @@ export function ServiceForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ServiceInput>({ resolver: zodResolver(serviceSchema), defaultValues: { is_active: true } });
+  } = useForm<z.input<typeof serviceSchema>, unknown, ServiceInput>({
+    resolver: zodResolver(serviceSchema),
+    defaultValues: { is_active: true },
+  });
 
   const onSubmit = (values: ServiceInput) => {
     startTransition(async () => {

@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import type { EmployeeCardProps } from "@/components/types";
+import type { Resource } from "@/types/database";
 
 const DOT: Record<NonNullable<EmployeeCardProps["statusLabel"]>, string> = {
   Available: "bg-emerald-500",
@@ -9,7 +10,12 @@ const DOT: Record<NonNullable<EmployeeCardProps["statusLabel"]>, string> = {
   "Off today": "bg-slate-300",
 };
 
-export function EmployeeCard({ resource, statusLabel, selected, onSelect }: EmployeeCardProps) {
+export function EmployeeCard<T extends Pick<Resource, "id" | "name" | "type" | "is_active"> = Resource>({
+  resource,
+  statusLabel,
+  selected,
+  onSelect,
+}: EmployeeCardProps<T>) {
   return (
     <button
       type="button"

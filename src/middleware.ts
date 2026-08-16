@@ -25,7 +25,17 @@ export async function middleware(request: NextRequest) {
   );
 
   // Touch the session so expired tokens get refreshed before hitting a page.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isProtected =
+    request.nextUrl.pathname.startsWith("/dashboard") || request.nextUrl.pathname.startsWith("/employee");
+
+  if (isProtected && !user) {
+    const redirectUrl = new URL("/auth/login", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
 
   return response;
 }

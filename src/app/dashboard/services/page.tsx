@@ -1,8 +1,9 @@
-// OWNER: Backend-1 (baza tayyor — tahrirlash/o'chirish UI'ni kengaytiring)
+// OWNER: Backend-1
 import { PageHeader } from "@/components/layout/page-header";
 import { DataTable } from "@/components/dashboard/data-table";
 import { EmptyState } from "@/components/layout/empty-state";
 import { ServiceForm } from "@/components/dashboard/service-form";
+import { ServiceRowActions } from "@/components/dashboard/service-row-actions";
 import { requireCurrentMembership } from "@/lib/permissions/get-current-membership";
 import { listServices } from "@/lib/actions/services";
 import { Scissors } from "lucide-react";
@@ -31,6 +32,7 @@ export default async function ServicesPage() {
                 </span>
               ),
             },
+            { header: "Amallar", cell: (s) => <ServiceRowActions service={s} /> },
           ]}
         />
       )}

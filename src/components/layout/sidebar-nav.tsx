@@ -40,13 +40,15 @@ export function SidebarNav() {
           <Link
             key={href}
             href={href}
+            title={label}
             className={cn(
               "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "justify-center lg:justify-start",
               active ? "bg-accent-50 text-accent-700" : "text-slate-600 hover:bg-surface-muted"
             )}
           >
-            <Icon className="h-4 w-4" />
-            {label}
+            <Icon className="h-4 w-4 shrink-0" />
+            <span className="hidden lg:inline">{label}</span>
           </Link>
         );
       })}

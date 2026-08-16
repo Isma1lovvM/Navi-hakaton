@@ -4,19 +4,28 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { BookingStatusBadge } from "@/components/booking/booking-status-badge";
 import { BookingStatusActions } from "@/components/booking/booking-status-actions";
 import { EmptyState } from "@/components/layout/empty-state";
+import { WalkInBookingForm } from "@/components/dashboard/walk-in-booking-form";
 import { requireCurrentMembership } from "@/lib/permissions/get-current-membership";
 import { listBookings } from "@/lib/actions/bookings";
+import { listServices } from "@/lib/actions/services";
+import { listEmployees } from "@/lib/actions/employees";
 import { ALLOWED_STATUS_TRANSITIONS } from "@/lib/validation/booking";
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
 
 export default async function BookingsPage() {
   const membership = await requireCurrentMembership();
-  const bookings = await listBookings(membership.businessId);
+  const [bookings, services, employees] = await Promise.all([
+    listBookings(membership.businessId),
+    listServices(membership.businessId),
+    listEmployees(membership.businessId),
+  ]);
+  const resources = employees.flatMap((e) => (e.resource ? [e.resource] : []));
 
   return (
     <div>
       <PageHeader title="Bookinglar" description="Barcha bronlar va ularning holati." />
+      <WalkInBookingForm businessId={membership.businessId} services={services} resources={resources} />
       {bookings.length === 0 ? (
         <EmptyState title="Hali booking yo'q" icon={CalendarDays} />
       ) : (
@@ -31,7 +40,7 @@ export default async function BookingsPage() {
             {
               header: "Amallar",
               cell: (b) => (
-                <BookingStatusActions bookingId={b.id} allowedNext={(ALLOWED_STATUS_TRANSITIONS[b.status] ?? []) as never} />
+                <BookingStatusActions bookingId={b.id} allowedNext={ALLOWED_STATUS_TRANSITIONS[b.status] ?? []} />
               ),
             },
           ]}

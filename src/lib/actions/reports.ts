@@ -58,7 +58,7 @@ export async function getWeeklyRevenue(businessId: string): Promise<WeeklyRevenu
     days.push({ date: iso, label: iso.slice(5), revenue: 0 });
   }
 
-  const from = days[0].date;
+  const from = days[0]!.date;
   const { data: payments } = await supabase
     .from("payments")
     .select("amount, booking:bookings!inner(business_id, date)")
