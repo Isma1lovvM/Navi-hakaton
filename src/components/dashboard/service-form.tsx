@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
@@ -16,7 +16,15 @@ export function ServiceForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ServiceInput>({ resolver: zodResolver(serviceSchema), defaultValues: { is_active: true } });
+  } = useForm<ServiceInput>({
+    // zod's `.coerce.number()` fields make the resolver's *input* type
+    // technically `unknown` (pre-coercion) vs `ServiceInput`'s `number`
+    // (post-coercion) — zod v4 + @hookform/resolvers v5 type this strictly
+    // even though the runtime behavior (parse raw string -> coerced number)
+    // is exactly what we want here. Cast rather than fight the generics.
+    resolver: zodResolver(serviceSchema) as Resolver<ServiceInput>,
+    defaultValues: { is_active: true },
+  });
 
   const onSubmit = (values: ServiceInput) => {
     startTransition(async () => {

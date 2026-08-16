@@ -12,6 +12,11 @@ export const businessSchema = z.object({
 });
 export type BusinessInput = z.infer<typeof businessSchema>;
 
+// Settings sahifasidagi profil formasi uchun — slug'ga tegmaymiz (public
+// booking sahifasi shu bo'yicha marshrutlanadi, uni o'zgartirish alohida oqim).
+export const businessProfileSchema = businessSchema.pick({ name: true, address: true, phone: true });
+export type BusinessProfileInput = z.infer<typeof businessProfileSchema>;
+
 const timeString = z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/, "HH:MM formatida bo'lishi kerak");
 
 export const businessHoursDaySchema = z
