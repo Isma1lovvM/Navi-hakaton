@@ -25,7 +25,7 @@ export function WalkInBookingForm({
   const [open, setOpen] = useState(false);
   const [serviceId, setServiceId] = useState("");
   const [resourceId, setResourceId] = useState("");
-  const [startAt, setStartAt] = useState(nowLocalIso());
+  const [startAt, setStartAt] = useState(() => nowLocalIso());
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [isPending, startTransition] = useTransition();
